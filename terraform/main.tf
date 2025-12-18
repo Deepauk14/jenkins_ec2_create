@@ -24,12 +24,12 @@ resource "aws_security_group" "web_sg" {
 }
 
 resource "aws_instance" "web" {
-  ami                    = "ami-00d8fc944fb171e29"
-  instance_type          = "t2.micro"
+  ami                    = "ami-00ca570c1b6d79f36"
+  instance_type          = "t3.micro"
   key_name               = "mykey"
   vpc_security_group_ids = [aws_security_group.web_sg.id]
 
-  user_data = file("userdata.sh")
+  user_data = file("user_data.sh")
 
   tags = {
     Name = "Jenkins-Web-Server"
