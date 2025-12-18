@@ -22,13 +22,13 @@ pipeline {
                     credentialsId: 'aws-creds'
                 ]]) {
                     script {
-                        // Check if Terraform exists
+                        echo "Checking if Terraform is installed..."
                         def terraformCheck = bat(script: 'terraform -version', returnStatus: true)
                         if (terraformCheck != 0) {
-                            error "Terraform is not installed or not in PATH! Please install Terraform and restart Jenkins."
+                            error "Terraform is not installed or not in PATH! Please install Terraform."
                         }
 
-                        echo "Terraform is installed. Proceeding with Init, Plan, Apply..."
+                        echo "Terraform is installed. Running Init, Plan, Apply..."
 
                         // Initialize Terraform
                         bat 'terraform init'
@@ -36,9 +36,14 @@ pipeline {
                         // Terraform Plan
                         bat 'terraform plan'
 
-                        // Terraform Apply
+                        // Terraform Apply (auto-approve)
                         bat 'terraform apply -auto-approve'
+
+                        echo "Terraform execution completed."
                     } // closes script
                 } // closes withCredentials
             } // closes steps
         } // closes stage
+
+    } // closes stages
+} // closes pipeline
