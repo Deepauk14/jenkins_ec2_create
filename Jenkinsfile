@@ -9,42 +9,30 @@ pipeline {
 
         stage('Checkout Code') {
             steps {
+                echo "Checking out code from GitHub..."
                 git branch: 'main',
                     url: 'https://github.com/Deepauk14/jenkins_ec2_create.git'
             }
         }
 
-        stage('Terraform Init') {
+        stage('Terraform Steps') {
             steps {
                 withCredentials([[
                     $class: 'AmazonWebServicesCredentialsBinding',
                     credentialsId: 'aws-creds'
                 ]]) {
-                    bat 'terraform init'
-                }
-            }
-        }
+                    script {
+                        // Check if Terraform exists
+                        def terraformCheck = bat(script: 'terraform -version', returnStatus: true)
+                        if (terraformCheck != 0) {
+                            error "Terraform is not installed or not in PATH! Please install Terraform and restart Jenkins."
+                        }
 
-        stage('Terraform Plan') {
-            steps {
-                withCredentials([[
-                    $class: 'AmazonWebServicesCredentialsBinding',
-                    credentialsId: 'aws-creds'
-                ]]) {
-                    bat 'terraform plan'
-                }
-            }
-        }
+                        echo "Terraform is installed. Proceeding with Init, Plan, Apply..."
 
-        stage('Terraform Apply') {
-            steps {
-                withCredentials([[
-                    $class: 'AmazonWebServicesCredentialsBinding',
-                    credentialsId: 'aws-creds'
-                ]]) {
-                    bat 'terraform apply -auto-approve'
-                }
-            }
-        }
-    }
-}
+                        // Initialize Terraform
+                        bat 'terraform init'
+
+                        // Terraform Plan
+                        bat 'terraform plan'
+
