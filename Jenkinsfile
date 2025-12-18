@@ -2,7 +2,9 @@ pipeline {
     agent any
 
     environment {
-        AWS_DEFAULT_REGION = "ap-southeast-1"
+        AWS_ACCESS_KEY_ID     = credentials('aws-access-key')
+        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-key')
+        AWS_DEFAULT_REGION    = "ap-south-1"
     }
 
     stages {
@@ -10,51 +12,26 @@ pipeline {
         stage('Checkout Code') {
             steps {
                 git branch: 'main',
-                    url: 'https://github.com/YOUR_USERNAME/YOUR_REPO.git'
+                    url: 'https://github.com/Deepauk14/jenkins_ec2_create.git'
             }
         }
 
         stage('Terraform Init') {
             steps {
-                withCredentials([[
-                    $class: 'AmazonWebServicesCredentialsBinding',
-                    credentialsId: 'aws-creds'
-                ]]) {
-                    sh '''
-                        cd terraform
-                        terraform init
-                    '''
-                }
+                bat 'terraform init'
             }
         }
 
         stage('Terraform Plan') {
             steps {
-                withCredentials([[
-                    $class: 'AmazonWebServicesCredentialsBinding',
-                    credentialsId: 'aws-creds'
-                ]]) {
-                    sh '''
-                        cd terraform
-                        terraform plan
-                    '''
-                }
+                bat 'terraform plan'
             }
         }
 
         stage('Terraform Apply') {
             steps {
-                withCredentials([[
-                    $class: 'AmazonWebServicesCredentialsBinding',
-                    credentialsId: 'aws-creds'
-                ]]) {
-                    sh '''
-                        cd terraform
-                        terraform apply -auto-approve
-                    '''
-                }
+                bat 'terraform apply -auto-approve'
             }
         }
     }
 }
-
