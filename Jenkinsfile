@@ -36,3 +36,9 @@ pipeline {
                         // Terraform Plan
                         bat 'terraform plan'
 
+                        // Terraform Apply
+                        bat 'terraform apply -auto-approve'
+                    } // closes script
+                } // closes withCredentials
+            } // closes steps
+        } // closes stage
